@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "check-maker"
+version = "0.1.0"
+description = "API microservice for generating checks by orders"
+authors = ["stigsanek <stigsanek@yandex.ru>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+django = "^4.1.4"
+djangorestframework = "^3.14.0"
+dj-database-url = "^1.2.0"
+gunicorn = "^20.1.0"
+psycopg2 = "^2.9.5"
+python-dotenv = "^0.21.0"
+pyyaml = "^6.0"
+uritemplate = "^4.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.1"
+flake8 = "^6.0.0"
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+pytest-django = "^4.5.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
