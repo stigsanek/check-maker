@@ -32,4 +32,5 @@ jobs:
       # Run migrations
       - name: Run migrations
         run: |
+          echo ${{ secrets.DATABASE_URL }}
           make migrate
