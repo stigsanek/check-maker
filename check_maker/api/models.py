@@ -50,6 +50,7 @@ class Printer(models.Model):
     )
     api_key = models.UUIDField(
         default=uuid.uuid4,
+        unique=True,
         help_text=_('API access key')
     )
     check_type = models.CharField(
@@ -100,6 +101,7 @@ class Check(models.Model):
         help_text=_('Status of check')
     )
     pdf_file = models.FileField(
+        null=True,
         help_text=_('PDF file')
     )
     created_at = models.DateTimeField(
