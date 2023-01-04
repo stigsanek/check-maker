@@ -2,7 +2,6 @@ import uuid
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
 
 from check_maker.api import models
 
@@ -83,11 +82,6 @@ class CheckItemSerializer(serializers.ModelSerializer):
         )
 
     def validate_order(self, value):
-        if not value.get('merchant_point'):
-            raise serializers.ValidationError(
-                _('The order must contain an ') + "'merchant_point'"
-            )
-
         items = value.get('items')
 
         if not items or not isinstance(items, list):
@@ -101,19 +95,26 @@ class CheckItemSerializer(serializers.ModelSerializer):
                     _('Each item must contain a ') + "'name', 'price'"
                 )
 
+        merchant_point = value.get('merchant_point')
+
+        if not merchant_point:
+            raise serializers.ValidationError(
+                _('The order must contain an ') + "'merchant_point'"
+            )
+
+        if not models.Printer.objects.filter(merchant_point=merchant_point):
+            raise serializers.ValidationError(
+                _('No printers found for the merchant point')
+            )
+
         return value
 
     def create(self, validated_data):
-        order = validated_data['order']
-        printers = models.Printer.objects.filter(
-            merchant_point=order['merchant_point']
-        )
-
-        if not printers:
-            raise NotFound(_('No printers found for the merchant point'))
-
         instance = None
-        order['uuid'] = str(uuid.uuid4())
+        validated_data['order']['uuid'] = str(uuid.uuid4())
+        printers = models.Printer.objects.filter(
+            merchant_point=validated_data['order']['merchant_point']
+        )
 
         for printer in printers:
             validated_data['printer'] = printer
