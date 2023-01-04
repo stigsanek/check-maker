@@ -97,6 +97,7 @@ class Check(models.Model):
     )
     status = models.CharField(
         max_length=10,
+        default=STATUS_OF_CHECK[0][0],
         choices=STATUS_OF_CHECK,
         help_text=_('Status of check')
     )
