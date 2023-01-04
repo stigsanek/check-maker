@@ -81,6 +81,10 @@ class CheckItemSerializer(serializers.ModelSerializer):
             'updated_at'
         )
 
+    # Custom attribute for caching database values
+    # used when checking and creating an object
+    printers = None
+
     def validate_order(self, value):
         items = value.get('items')
 
@@ -102,7 +106,11 @@ class CheckItemSerializer(serializers.ModelSerializer):
                 _('The order must contain an ') + "'merchant_point'"
             )
 
-        if not models.Printer.objects.filter(merchant_point=merchant_point):
+        self.printers = models.Printer.objects.filter(
+            merchant_point=merchant_point
+        )
+
+        if not self.printers:
             raise serializers.ValidationError(
                 _('No printers found for the merchant point')
             )
@@ -112,11 +120,8 @@ class CheckItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = None
         validated_data['order']['uuid'] = str(uuid.uuid4())
-        printers = models.Printer.objects.filter(
-            merchant_point=validated_data['order']['merchant_point']
-        )
 
-        for printer in printers:
+        for printer in self.printers:
             validated_data['printer'] = printer
             validated_data['check_type'] = printer.check_type
             instance = super().create(validated_data)
