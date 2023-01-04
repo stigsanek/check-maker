@@ -14,8 +14,34 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from django.views.generic import TemplateView
+from rest_framework.routers import SimpleRouter
+from rest_framework.schemas import get_schema_view
+
+from check_maker.api import views
+
+router = SimpleRouter()
+router.register(prefix=r'merchant-points', viewset=views.MerchantPointViewSet)
+router.register(prefix=r'printers', viewset=views.PrinterViewSet)
+router.register(prefix=r'checks', viewset=views.CheckViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('openapi/', get_schema_view(
+        title="Check maker API",
+        description="API microservice for generating checks by orders",
+        public=True,
+        version="v1"
+    ), name='openapi-schema'),
+    path('redoc/', TemplateView.as_view(
+        template_name='redoc.html',
+        extra_context={'schema_url': 'openapi-schema'}
+    ), name='redoc'),
+    path('swagger-ui/', TemplateView.as_view(
+        template_name='swagger-ui.html',
+        extra_context={'schema_url': 'openapi-schema'}
+    ), name='swagger'),
+    path('', include(router.urls))
 ]
