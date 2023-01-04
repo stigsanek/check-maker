@@ -25,4 +25,4 @@ class CheckAdmin(admin.ModelAdmin):
     list_display = (
         'pdf_file', 'created_at', 'updated_at'
     )
-    list_filter = ('check_type', 'status')
+    list_filter = ('printer', 'check_type', 'status')
