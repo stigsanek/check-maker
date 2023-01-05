@@ -1,6 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.deletion import ProtectedError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -81,6 +84,7 @@ class CheckViewSet(CustomModelViewSet):
     retrieve: Returns check
     partial_update: Update check
     delete: Delete check
+    get_checks_for_print: Returns rendered check by printer api key
     """
     queryset = models.Check.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -93,3 +97,27 @@ class CheckViewSet(CustomModelViewSet):
             return serializers.CheckUpdateItemSerializer
 
         return serializers.CheckItemSerializer
+
+    @action(
+        methods=['get'],
+        detail=False,
+        url_path=r'for-print/(?P<api_key>[\w-]+)',
+        url_name='for-print'
+    )
+    def get_checks_for_print(self, request, api_key):
+        try:
+            printer = models.Printer.objects.get(api_key=api_key)
+        except (ObjectDoesNotExist, ValidationError):
+            raise NotFound
+
+        qs = models.Check.objects.filter(
+            printer_id=printer.pk, status='rendered'
+        ).order_by('pk')
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)

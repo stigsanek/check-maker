@@ -228,3 +228,21 @@ class TestChecks(TestAPI):
         self.assertFalse(
             Check.objects.filter(pk=self.check.pk).exists()
         )
+
+    def test_get_checks_for_print(self):
+        self.check.status = 'rendered'
+        self.check.save()
+
+        api_key = Printer.objects.get(pk=1).api_key
+        url_first = reverse_lazy('check-for-print', args=[api_key])
+        url_second = reverse_lazy('check-for-print', args=['test'])
+
+        resp = self.client.get(url_first)
+        data = resp.json()['results']
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['id'], self.check.pk)
+
+        resp = self.client.get(url_second)
+        self.assertEqual(resp.status_code, 404)
