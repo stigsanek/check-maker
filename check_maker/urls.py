@@ -21,6 +21,7 @@ from rest_framework.routers import SimpleRouter
 from rest_framework.schemas import get_schema_view
 
 from check_maker.api import views
+from check_maker.views import download
 
 router = SimpleRouter()
 router.register(r'merchant-points', views.MerchantPointViewSet)
@@ -30,6 +31,7 @@ router.register(r'checks', views.CheckViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('media/<path:path>/', download, name='media'),
     path('openapi/', get_schema_view(
         title='Check maker API',
         description=_('API microservice for generating checks by orders'),
