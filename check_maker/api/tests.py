@@ -1,0 +1,230 @@
+from rest_framework.reverse import reverse_lazy
+from rest_framework.test import APITestCase
+
+from check_maker.api.models import Check, MerchantPoint, Printer
+
+
+class TestAPI(APITestCase):
+    """Base test class"""
+    fixtures = ['merchant-points.json', 'printers.json', 'checks.json']
+
+
+class TestMerchantPoints(TestAPI):
+    """Tests for merchant points"""
+
+    def setUp(self):
+        self.mp = MerchantPoint.objects.get(pk=1)
+
+    def test_list(self):
+        url = reverse_lazy('merchantpoint-list')
+        resp = self.client.get(url)
+        data = resp.json()['results']
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0]['name'], self.mp.name)
+
+    def test_create(self):
+        url = reverse_lazy('merchantpoint-list')
+
+        resp = self.client.post(path=url, data={})
+        self.assertEqual(resp.status_code, 400)
+
+        resp = self.client.post(path=url, data={'name': 'test'})
+        self.assertEqual(resp.status_code, 201)
+        self.assertTrue(
+            MerchantPoint.objects.filter(name='test').exists()
+        )
+
+    def test_retrieve(self):
+        url = reverse_lazy('merchantpoint-detail', args=[self.mp.pk])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()['name'], self.mp.name)
+
+    def test_update(self):
+        url = reverse_lazy('merchantpoint-detail', args=[self.mp.pk])
+        data = {'name': ''}
+
+        resp = self.client.put(path=url, data=data)
+        self.assertEqual(resp.status_code, 405)
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 400)
+
+        data['name'] = 'test'
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(
+            MerchantPoint.objects.filter(name='test').exists()
+        )
+
+    def test_delete(self):
+        mp_second_id = 2
+        url_first = reverse_lazy('merchantpoint-detail', args=[self.mp.pk])
+        url_second = reverse_lazy('merchantpoint-detail', args=[mp_second_id])
+
+        resp = self.client.delete(url_first)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(len(resp.json()['protected_objects']), 3)
+        self.assertTrue(
+            MerchantPoint.objects.filter(pk=self.mp.pk).exists()
+        )
+
+        resp = self.client.delete(url_second)
+        self.assertEqual(resp.status_code, 204)
+        self.assertFalse(
+            MerchantPoint.objects.filter(pk=mp_second_id).exists()
+        )
+
+
+class TestPrinters(TestAPI):
+    """Tests for printers"""
+
+    def setUp(self):
+        self.printer = Printer.objects.get(pk=1)
+
+    def test_list(self):
+        url = reverse_lazy('printer-list')
+        resp = self.client.get(url)
+        data = resp.json()['results']
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]['name'], self.printer.name)
+
+    def test_create(self):
+        url = reverse_lazy('printer-list')
+        data = {'name': 'test', 'check_type': 'test', 'merchant_point': 2}
+
+        resp = self.client.post(path=url, data=data)
+        self.assertEqual(resp.status_code, 400)
+
+        data['check_type'] = 'kitchen'
+        resp = self.client.post(path=url, data=data)
+        api_key = resp.json()['api_key']
+
+        self.assertEqual(resp.status_code, 201)
+        self.assertTrue(api_key and len(api_key) > 16)
+        self.assertTrue(
+            Printer.objects.filter(name='test').exists()
+        )
+
+    def test_retrieve(self):
+        url = reverse_lazy('printer-detail', args=[self.printer.pk])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()['name'], self.printer.name)
+
+    def test_update(self):
+        url = reverse_lazy('printer-detail', args=[self.printer.pk])
+        data = {'check_type': 'test'}
+
+        resp = self.client.put(path=url, data=data)
+        self.assertEqual(resp.status_code, 405)
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 400)
+
+        data['check_type'] = 'client'
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(
+            Printer.objects.filter(
+                pk=self.printer.pk, check_type='client'
+            ).exists()
+        )
+
+    def test_delete(self):
+        printer_second_id = 3
+        url_first = reverse_lazy('printer-detail', args=[self.printer.pk])
+        url_second = reverse_lazy('printer-detail', args=[printer_second_id])
+
+        resp = self.client.delete(url_first)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(len(resp.json()['protected_objects']), 2)
+        self.assertTrue(
+            Printer.objects.filter(pk=self.printer.pk).exists()
+        )
+
+        resp = self.client.delete(url_second)
+        self.assertEqual(resp.status_code, 204)
+        self.assertFalse(
+            Printer.objects.filter(pk=printer_second_id).exists()
+        )
+
+
+class TestChecks(TestAPI):
+    """Tests for checks"""
+
+    def setUp(self):
+        self.check = Check.objects.get(pk=1)
+
+    def test_list(self):
+        url = reverse_lazy('check-list')
+        resp = self.client.get(url)
+        data = resp.json()['results']
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 4)
+        self.assertEqual(data[0]['id'], self.check.pk)
+
+    def test_create(self):
+        url = reverse_lazy('check-list')
+        data = {'order': {'merchant_point': 2}}
+
+        resp = self.client.post(path=url, data=data, format='json')
+        self.assertEqual(resp.status_code, 400)
+
+        data['order']['items'] = [{'name': 'test', 'price': 10}]
+        resp = self.client.post(path=url, data=data, format='json')
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertTrue('No printers found' in resp.json()['order'][0])
+
+        data['order']['merchant_point'] = 1
+        resp = self.client.post(path=url, data=data, format='json')
+        order_uuid = resp.json()['order']['uuid']
+        checks_len = len(Check.objects.filter(order__uuid=order_uuid))
+
+        self.assertEqual(resp.status_code, 201)
+        self.assertTrue(order_uuid and len(order_uuid) > 16)
+        self.assertEqual(checks_len, 3)
+
+    def test_retrieve(self):
+        url = reverse_lazy('check-detail', args=[self.check.pk])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()['id'], self.check.pk)
+
+    def test_update(self):
+        url = reverse_lazy('check-detail', args=[self.check.pk])
+        data = {'status': 'test'}
+
+        resp = self.client.put(path=url, data=data)
+        self.assertEqual(resp.status_code, 405)
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 400)
+
+        data['status'] = 'printed'
+
+        resp = self.client.patch(path=url, data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(
+            Check.objects.filter(pk=self.check.pk, status='printed').exists()
+        )
+
+    def test_delete(self):
+        url = reverse_lazy('check-detail', args=[self.check.pk])
+        resp = self.client.delete(url)
+
+        self.assertEqual(resp.status_code, 204)
+        self.assertFalse(
+            Check.objects.filter(pk=self.check.pk).exists()
+        )
