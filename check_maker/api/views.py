@@ -1,9 +1,41 @@
-from rest_framework import viewsets
+from django.db.models.deletion import ProtectedError
+from django.utils.translation import gettext_lazy as _
+from rest_framework import mixins, status
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from check_maker.api import models, serializers
 
 
-class MerchantPointViewSet(viewsets.ModelViewSet):
+class CustomModelViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+    """Custom ModelViewSet"""
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except ProtectedError as err:
+            data = {
+                'detail': _('Cannot delete object as it is being used'),
+                'protected_objects': [
+                    {'id': o.pk, 'name': str(o)} for o in err.protected_objects
+                ]
+            }
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class MerchantPointViewSet(CustomModelViewSet):
     """
     Views set for MerchantPoint
     list: Returns merchant point list
@@ -22,7 +54,7 @@ class MerchantPointViewSet(viewsets.ModelViewSet):
         return serializers.MerchantPointItemSerializer
 
 
-class PrinterViewSet(viewsets.ModelViewSet):
+class PrinterViewSet(CustomModelViewSet):
     """
     Views set for Printer
     list: Returns printer list
@@ -41,7 +73,7 @@ class PrinterViewSet(viewsets.ModelViewSet):
         return serializers.PrinterItemSerializer
 
 
-class CheckViewSet(viewsets.ModelViewSet):
+class CheckViewSet(CustomModelViewSet):
     """
     Views set for Check
     list: Returns check list
