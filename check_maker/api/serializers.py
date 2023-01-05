@@ -140,3 +140,10 @@ class CheckListSerializer(serializers.ModelSerializer):
             'status',
             'pdf_file'
         )
+
+
+class CheckUpdateItemSerializer(serializers.ModelSerializer):
+    """Serializer for update item Check"""
+    class Meta:
+        model = models.Check
+        fields = ('status',)

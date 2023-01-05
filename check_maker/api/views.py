@@ -47,13 +47,17 @@ class CheckViewSet(viewsets.ModelViewSet):
     list: Returns check list
     create: Create check
     retrieve: Returns check
+    partial_update: Update check
     delete: Delete check
     """
     queryset = models.Check.objects.all()
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action == 'list':
             return serializers.CheckListSerializer
+
+        if self.action == 'partial_update':
+            return serializers.CheckUpdateItemSerializer
 
         return serializers.CheckItemSerializer
