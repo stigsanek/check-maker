@@ -44,7 +44,7 @@ class MerchantPointViewSet(CustomModelViewSet):
     partial_update: Update merchant point
     delete: Delete merchant point
     """
-    queryset = models.MerchantPoint.objects.all()
+    queryset = models.MerchantPoint.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
@@ -63,7 +63,7 @@ class PrinterViewSet(CustomModelViewSet):
     partial_update: Update printer
     delete: Delete printer
     """
-    queryset = models.Printer.objects.all()
+    queryset = models.Printer.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
@@ -82,7 +82,7 @@ class CheckViewSet(CustomModelViewSet):
     partial_update: Update check
     delete: Delete check
     """
-    queryset = models.Check.objects.all()
+    queryset = models.Check.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
