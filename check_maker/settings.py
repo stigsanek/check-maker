@@ -140,3 +140,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # noqa E501
     'PAGE_SIZE': 10
 }
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
