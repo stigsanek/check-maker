@@ -68,6 +68,7 @@ class PrinterViewSet(CustomModelViewSet):
     """
     queryset = models.Printer.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
+    filterset_fields = ['check_type', 'merchant_point']
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -88,6 +89,7 @@ class CheckViewSet(CustomModelViewSet):
     """
     queryset = models.Check.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
+    filterset_fields = ['printer', 'check_type', 'status']
 
     def get_serializer_class(self):
         if self.action == 'list':

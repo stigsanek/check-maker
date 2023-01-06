@@ -95,6 +95,14 @@ class TestPrinters(TestAPI):
         self.assertEqual(len(data), 3)
         self.assertEqual(data[0]['name'], self.printer.name)
 
+        resp = self.client.get(f'{url}?check_type=test')
+        self.assertEqual(resp.status_code, 400)
+
+        resp = self.client.get(f'{url}?check_type=kitchen')
+        data = resp.json()['results']
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 1)
+
     def test_create(self):
         url = reverse_lazy('printer-list')
         data = {'name': 'test', 'check_type': 'test', 'merchant_point': 2}
@@ -118,6 +126,9 @@ class TestPrinters(TestAPI):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['name'], self.printer.name)
+
+        resp = self.client.get(f'{url}?check_type=client')
+        self.assertEqual(resp.status_code, 404)
 
     def test_update(self):
         url = reverse_lazy('printer-detail', args=[self.printer.pk])
@@ -173,6 +184,14 @@ class TestChecks(TestAPI):
         self.assertEqual(len(data), 4)
         self.assertEqual(data[0]['id'], self.check.pk)
 
+        resp = self.client.get(f'{url}?check_type=test')
+        self.assertEqual(resp.status_code, 400)
+
+        resp = self.client.get(f'{url}?check_type=kitchen')
+        data = resp.json()['results']
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(data), 2)
+
     def test_create(self):
         url = reverse_lazy('check-list')
         data = {'order': {'merchant_point': 2}}
@@ -201,6 +220,9 @@ class TestChecks(TestAPI):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()['id'], self.check.pk)
+
+        resp = self.client.get(f'{url}?status=printed')
+        self.assertEqual(resp.status_code, 404)
 
     def test_update(self):
         url = reverse_lazy('check-detail', args=[self.check.pk])
