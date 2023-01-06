@@ -6,7 +6,7 @@ from check_maker.api.models import Check, MerchantPoint, Printer
 
 class TestAPI(APITestCase):
     """Base test class"""
-    fixtures = ['merchant-points.json', 'printers.json', 'checks.json']
+    fixtures = ['data.json']
 
 
 class TestMerchantPoints(TestAPI):
