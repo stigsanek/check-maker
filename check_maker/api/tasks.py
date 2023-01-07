@@ -40,7 +40,7 @@ def create_checks(self, order_uuid):
 
         except requests.RequestException as err:
             log.error(err)
-            self.retry(exc=err)
+            raise self.retry(exc=err)
 
 
 def convert_html_to_pdf(html, file_name):
