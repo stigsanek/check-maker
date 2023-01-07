@@ -63,18 +63,22 @@
       "check_type": "kitchen",
       "order": {
         "merchant_point": 1,
+        "total_count": 590,
         "items": [
           {
             "name": "pizza",
-            "price": 500
+            "price": 500,
+            "count": 1
           },
           {
             "name": "sauce",
-            "price": 20
+            "price": 20,
+            "count": 1
           },
           {
             "name": "lemonade",
-            "price": 70
+            "price": 70,
+            "count": 1
           }
         ],
         "uuid": "d93645e9-d2d8-48fa-8352-d0dc7736c991"
@@ -93,18 +97,22 @@
       "check_type": "client",
       "order": {
         "merchant_point": 1,
+        "total_count": 590,
         "items": [
           {
             "name": "pizza",
-            "price": 500
+            "price": 500,
+            "count": 1
           },
           {
             "name": "sauce",
-            "price": 20
+            "price": 20,
+            "count": 1
           },
           {
             "name": "lemonade",
-            "price": 70
+            "price": 70,
+            "count": 1
           }
         ],
         "uuid": "d93645e9-d2d8-48fa-8352-d0dc7736c991"
@@ -123,18 +131,22 @@
       "check_type": "kitchen",
       "order": {
         "merchant_point": 1,
+        "total_count": 720,
         "items": [
           {
             "name": "pizza",
-            "price": 600
+            "price": 600,
+            "count": 1
           },
           {
             "name": "sauce",
-            "price": 30
+            "price": 30,
+            "count": 1
           },
           {
             "name": "lemonade",
-            "price": 90
+            "price": 90,
+            "count": 1
           }
         ],
         "uuid": "1914e8f3-2c18-4024-8df7-e4749988607b"
@@ -153,18 +165,22 @@
       "check_type": "client",
       "order": {
         "merchant_point": 1,
+        "total_count": 720,
         "items": [
           {
             "name": "pizza",
-            "price": 600
+            "price": 600,
+            "count": 1
           },
           {
             "name": "sauce",
-            "price": 30
+            "price": 30,
+            "count": 1
           },
           {
             "name": "lemonade",
-            "price": 90
+            "price": 90,
+            "count": 1
           }
         ],
         "uuid": "1914e8f3-2c18-4024-8df7-e4749988607b"

@@ -194,7 +194,7 @@ class TestChecks(TestAPI):
 
     def test_create(self):
         url = reverse_lazy('check-list')
-        data = {'order': {'merchant_point': 2}}
+        data = {'order': {'merchant_point': 2, 'total_price': 20}}
 
         resp = self.client.post(path=url, data=data, format='json')
         self.assertEqual(resp.status_code, 400)
