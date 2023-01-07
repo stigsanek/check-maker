@@ -12,6 +12,10 @@ services:
   redis:
     image: 'redis:6.2.8'
 
+  wkhtmltopdf:
+    image: 'openlabs/docker-wkhtmltopdf-aas:latest'
+    restart: on-failure
+
   app:
     build:
       context: .
@@ -27,6 +31,7 @@ services:
     depends_on:
       - db
       - redis
+      - wkhtmltopdf
 
   celery:
     build:
