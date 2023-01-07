@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from check_maker.api import models, serializers
+from check_maker.api.tasks import create_checks
 
 log = logging.getLogger(__name__)
 
@@ -104,6 +105,20 @@ class CheckViewSet(CustomModelViewSet):
             return serializers.CheckUpdateItemSerializer
 
         return serializers.CheckItemSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        create_checks.delay(serializer.data['order']['uuid'])
+
+        return Response(
+            data=serializer.data['order'],
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
 
     @action(
         methods=['get'],

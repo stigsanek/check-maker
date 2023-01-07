@@ -207,7 +207,7 @@ class TestChecks(TestAPI):
 
         data['order']['merchant_point'] = 1
         resp = self.client.post(path=url, data=data, format='json')
-        order_uuid = resp.json()['order']['uuid']
+        order_uuid = resp.json()['uuid']
         checks_len = len(Check.objects.filter(order__uuid=order_uuid))
 
         self.assertEqual(resp.status_code, 201)
