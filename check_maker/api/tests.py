@@ -1,12 +1,18 @@
+from unittest.mock import patch
+
+from celery.exceptions import Retry
+from pytest import raises
+from requests import RequestException
 from rest_framework.reverse import reverse_lazy
 from rest_framework.test import APITestCase
 
 from check_maker.api.models import Check, MerchantPoint, Printer
+from check_maker.api.tasks import create_checks
 
 
 class TestAPI(APITestCase):
     """Base test class"""
-    fixtures = ['merchant-points.json', 'printers.json', 'checks.json']
+    fixtures = ['data.json']
 
 
 class TestMerchantPoints(TestAPI):
@@ -192,14 +198,15 @@ class TestChecks(TestAPI):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(data), 2)
 
-    def test_create(self):
+    @patch('check_maker.api.tasks.create_checks.delay')
+    def test_create(self, mock_delay):
         url = reverse_lazy('check-list')
-        data = {'order': {'merchant_point': 2}}
+        data = {'order': {'merchant_point': 2, 'total_price': 20}}
 
         resp = self.client.post(path=url, data=data, format='json')
         self.assertEqual(resp.status_code, 400)
 
-        data['order']['items'] = [{'name': 'test', 'price': 10}]
+        data['order']['items'] = [{'name': 'test', 'price': 10, 'count': 2}]
         resp = self.client.post(path=url, data=data, format='json')
 
         self.assertEqual(resp.status_code, 400)
@@ -207,7 +214,7 @@ class TestChecks(TestAPI):
 
         data['order']['merchant_point'] = 1
         resp = self.client.post(path=url, data=data, format='json')
-        order_uuid = resp.json()['order']['uuid']
+        order_uuid = resp.json()['uuid']
         checks_len = len(Check.objects.filter(order__uuid=order_uuid))
 
         self.assertEqual(resp.status_code, 201)
@@ -268,3 +275,17 @@ class TestChecks(TestAPI):
 
         resp = self.client.get(url_second)
         self.assertEqual(resp.status_code, 404)
+
+    @patch('check_maker.api.tasks.convert_html_to_pdf')
+    @patch('check_maker.api.tasks.create_checks.retry')
+    def test_create_check(self, mock_retry, mock_convert_html_to_pdf):
+        create_checks(self.check.order['uuid'])
+        check = Check.objects.get(pk=1)
+
+        self.assertEqual(check.status, 'rendered')
+        self.assertTrue(check.order['uuid'] in check.pdf_file.name)
+
+        mock_retry.side_effect = Retry()
+        mock_convert_html_to_pdf.side_effect = RequestException()
+        with raises(Retry):
+            create_checks(check.order['uuid'])

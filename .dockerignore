@@ -1,0 +1,11 @@
+.git/
+
+.pytest_cache/
+.venv/
+
+.env
+*.log
+*.sqlite3
+
+.idea/
+.vscode/

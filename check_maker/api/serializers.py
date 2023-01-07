@@ -86,18 +86,12 @@ class CheckItemSerializer(serializers.ModelSerializer):
     printers = None
 
     def validate_order(self, value):
-        items = value.get('items')
+        self._validate_items(value.get('items'))
 
-        if not items or not isinstance(items, list):
+        if not value.get('total_price'):
             raise serializers.ValidationError(
-                _('The order must contain a non-empty list of ') + "'items'"
+                _('The order must contain an ') + "'total_price'"
             )
-
-        for item in items:
-            if not item.get('name') or not item.get('price'):
-                raise serializers.ValidationError(
-                    _('Each item must contain a ') + "'name', 'price'"
-                )
 
         merchant_point = value.get('merchant_point')
 
@@ -116,6 +110,23 @@ class CheckItemSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+    def _validate_items(self, items):
+        """Validate items in order"""
+        if not items or not isinstance(items, list):
+            raise serializers.ValidationError(
+                _('The order must contain a non-empty list of ') + "'items'"
+            )
+
+        for item in items:
+            is_name = item.get('name')
+            is_price = item.get('price')
+            is_count = item.get('count')
+
+            if not is_name or not is_price or not is_count:
+                raise serializers.ValidationError(
+                    _('Each item must contain a ') + "'name', 'price', 'count'"
+                )
 
     def create(self, validated_data):
         instance = None

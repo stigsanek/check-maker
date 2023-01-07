@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.deletion import ProtectedError
 from django.utils.translation import gettext_lazy as _
@@ -8,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from check_maker.api import models, serializers
+from check_maker.api.tasks import create_checks
+
+log = logging.getLogger(__name__)
 
 
 class CustomModelViewSet(
@@ -26,6 +31,7 @@ class CustomModelViewSet(
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         except ProtectedError as err:
+            log.error(err)
             data = {
                 'detail': _('Cannot delete object as it is being used'),
                 'protected_objects': [
@@ -100,6 +106,20 @@ class CheckViewSet(CustomModelViewSet):
 
         return serializers.CheckItemSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        create_checks.delay(serializer.data['order']['uuid'])
+
+        return Response(
+            data=serializer.data['order'],
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
     @action(
         methods=['get'],
         detail=False,
@@ -109,7 +129,8 @@ class CheckViewSet(CustomModelViewSet):
     def get_checks_for_print(self, request, api_key):
         try:
             printer = models.Printer.objects.get(api_key=api_key)
-        except (ObjectDoesNotExist, ValidationError):
+        except (ObjectDoesNotExist, ValidationError) as err:
+            log.error(err)
             raise NotFound
 
         qs = models.Check.objects.filter(

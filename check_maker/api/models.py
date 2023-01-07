@@ -25,6 +25,10 @@ class MerchantPoint(models.Model):
         max_length=100,
         help_text=_('Name')
     )
+    address = models.CharField(
+        max_length=250,
+        help_text=_('Address')
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         help_text=_('Creation date')
