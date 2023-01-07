@@ -199,7 +199,7 @@ class TestChecks(TestAPI):
         resp = self.client.post(path=url, data=data, format='json')
         self.assertEqual(resp.status_code, 400)
 
-        data['order']['items'] = [{'name': 'test', 'price': 10}]
+        data['order']['items'] = [{'name': 'test', 'price': 10, 'count': 2}]
         resp = self.client.post(path=url, data=data, format='json')
 
         self.assertEqual(resp.status_code, 400)

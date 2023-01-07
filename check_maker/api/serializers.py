@@ -94,9 +94,13 @@ class CheckItemSerializer(serializers.ModelSerializer):
             )
 
         for item in items:
-            if not item.get('name') or not item.get('price'):
+            is_name = item.get('name')
+            is_price = item.get('price')
+            is_count = item.get('count')
+
+            if not is_name or not is_price or not is_count:
                 raise serializers.ValidationError(
-                    _('Each item must contain a ') + "'name', 'price'"
+                    _('Each item must contain a ') + "'name', 'price', 'count'"
                 )
 
         merchant_point = value.get('merchant_point')
