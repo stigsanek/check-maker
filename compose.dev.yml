@@ -28,6 +28,7 @@ services:
     restart: always
     volumes:
       - .:/app/
+      - media:/app/media/
     depends_on:
       - db
       - redis
@@ -41,8 +42,11 @@ services:
     env_file:
       - ./.env.dev
     restart: on-failure
+    volumes:
+      - media:/app/media/
     depends_on:
       - app
 
 volumes:
   postgres_data:
+  media:
