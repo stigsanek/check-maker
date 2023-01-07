@@ -278,7 +278,7 @@ class TestChecks(TestAPI):
 
     @patch('check_maker.api.tasks.convert_html_to_pdf')
     @patch('check_maker.api.tasks.create_checks.retry')
-    def test_create_check(self, mock_retry, mock_convert_html_to_pdf):
+    def test_create_checks(self, mock_retry, mock_convert_html_to_pdf):
         create_checks(self.check.order['uuid'])
         check = Check.objects.get(pk=1)
 
