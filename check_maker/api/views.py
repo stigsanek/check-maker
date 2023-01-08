@@ -91,7 +91,7 @@ class CheckViewSet(CustomModelViewSet):
     retrieve: Returns check
     partial_update: Update check
     delete: Delete check
-    get_checks_for_print: Returns rendered check by printer api key
+    get_for_print: Returns rendered check by printer api key
     """
     queryset = models.Check.objects.order_by('pk')
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -126,7 +126,7 @@ class CheckViewSet(CustomModelViewSet):
         url_path=r'for-print/(?P<api_key>[\w-]+)',
         url_name='for-print'
     )
-    def get_checks_for_print(self, request, api_key):
+    def get_for_print(self, request, api_key):
         try:
             printer = models.Printer.objects.get(api_key=api_key)
         except (ObjectDoesNotExist, ValidationError) as err:

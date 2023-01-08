@@ -258,7 +258,7 @@ class TestChecks(TestAPI):
             Check.objects.filter(pk=self.check.pk).exists()
         )
 
-    def test_get_checks_for_print(self):
+    def test_get_for_print(self):
         self.check.status = 'rendered'
         self.check.save()
 
