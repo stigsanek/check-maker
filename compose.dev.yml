@@ -47,6 +47,16 @@ services:
     depends_on:
       - app
 
+  flower:
+    image: 'mher/flower:1.2'
+    env_file:
+      - ./.env.dev
+    ports:
+      - "5555:5555"
+    restart: on-failure
+    depends_on:
+      - celery
+
 volumes:
   postgres_data:
   media:
