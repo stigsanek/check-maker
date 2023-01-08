@@ -63,7 +63,7 @@
       "check_type": "kitchen",
       "order": {
         "merchant_point": 1,
-        "total_count": 590,
+        "total_price": 590,
         "items": [
           {
             "name": "pizza",
@@ -97,7 +97,7 @@
       "check_type": "client",
       "order": {
         "merchant_point": 1,
-        "total_count": 590,
+        "total_price": 590,
         "items": [
           {
             "name": "pizza",
@@ -131,7 +131,7 @@
       "check_type": "kitchen",
       "order": {
         "merchant_point": 1,
-        "total_count": 720,
+        "total_price": 720,
         "items": [
           {
             "name": "pizza",
@@ -165,7 +165,7 @@
       "check_type": "client",
       "order": {
         "merchant_point": 1,
-        "total_count": 720,
+        "total_price": 720,
         "items": [
           {
             "name": "pizza",
