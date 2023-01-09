@@ -76,7 +76,9 @@ Creating check-maker_celery_1      ... done
 Creating check-maker_flower_1      ... done
 ```
 
-Open [http://127.0.0.1:8000/swagger-ui/](http://127.0.0.1:8000/swagger-ui/) or [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) in your browser.
+* Open [http://127.0.0.1:8000/swagger-ui/](http://127.0.0.1:8000/swagger-ui/) or [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) in your browser for to see all the API methods.
+
+* Open [http://127.0.0.1:5555/](http://127.0.0.1:5555/) in your browser to monitor task processing.
 
 #### Run production mode
 
@@ -95,3 +97,7 @@ Creating check-maker_flower_1      ... done
 ```
 
 Open [http://127.0.0.1:8000/swagger-ui/](http://127.0.0.1:8000/swagger-ui/) or [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) in your browser.
+
+* Open [http://127.0.0.1:8000/swagger-ui/](http://127.0.0.1:8000/swagger-ui/) or [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) in your browser for to see all the API methods.
+
+* Open [http://127.0.0.1:5555/](http://127.0.0.1:5555/) in your browser to monitor task processing.
