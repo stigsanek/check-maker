@@ -36,7 +36,10 @@ class TestMerchantPoints(TestAPI):
         resp = self.client.post(path=url, data={})
         self.assertEqual(resp.status_code, 400)
 
-        resp = self.client.post(path=url, data={'name': 'test'})
+        resp = self.client.post(
+            path=url,
+            data={'name': 'test', 'address': 'test'}
+        )
         self.assertEqual(resp.status_code, 201)
         self.assertTrue(
             MerchantPoint.objects.filter(name='test').exists()

@@ -13,6 +13,7 @@ class MerchantPointItemSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'address',
             'created_at',
             'updated_at'
         )
@@ -25,7 +26,8 @@ class MerchantPointListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'url',
-            'name'
+            'name',
+            'address'
         )
 
 
